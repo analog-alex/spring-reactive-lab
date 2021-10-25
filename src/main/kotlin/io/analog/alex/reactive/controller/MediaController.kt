@@ -2,6 +2,7 @@ package io.analog.alex.reactive.controller
 
 import io.analog.alex.reactive.errors.NonUniqueNameException
 import io.analog.alex.reactive.model.Media
+import io.analog.alex.reactive.service.CacheService
 import io.analog.alex.reactive.service.CoroutineMediaService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -18,22 +19,23 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/media")
 class MediaController(
-    val mediaService: CoroutineMediaService
+    val mediaService: CoroutineMediaService,
+    val cache: CacheService
 ) {
 
     @GetMapping
-    suspend fun getAll(): Flow<Media> = mediaService.findAll()
+    suspend fun getAll(): Flow<Media> = cache.readThroughFor("media", "all") { mediaService.findAll() }
 
     @GetMapping("/search")
     suspend fun search(@RequestParam(required = false) author: String?): Flow<Media> {
         return author?.let {
-            mediaService.findByAuthor(it)
+            cache.readThroughFor("media", "by-author") { mediaService.findByAuthor(it) }
         } ?: emptyFlow()
     }
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun create(@RequestBody entity: Media): Media {
-        return mediaService.create(entity) ?: throw NonUniqueNameException()
+        return cache.writeAndEvict("media") {mediaService.create(entity) } ?: throw NonUniqueNameException()
     }
 }

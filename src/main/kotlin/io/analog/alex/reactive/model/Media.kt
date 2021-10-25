@@ -3,6 +3,7 @@ package io.analog.alex.reactive.model
 import org.jetbrains.annotations.NotNull
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
+import java.io.Serializable
 import java.time.LocalDate
 
 enum class Type { MOVIE, GAME, BOOK, ALBUM, PAITING, SCULPTURE}
@@ -26,4 +27,4 @@ data class Media (
 
     @NotNull
     val rating: Int
-)
+) : Serializable
