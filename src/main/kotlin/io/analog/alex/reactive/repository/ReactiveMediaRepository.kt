@@ -10,4 +10,5 @@ import reactor.core.publisher.Flux
 interface ReactiveMediaRepository : ReactiveMongoRepository<Media, String> {
     fun findAllByType(type: Type): Flux<Media>
     fun findAllByAuthor(author: String): Flux<Media>
+    fun findAllByName(name: String): Flux<Media>
 }

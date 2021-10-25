@@ -25,5 +25,5 @@ data class Media (
     val createdAt: LocalDate,
 
     @NotNull
-    val rating: Integer
+    val rating: Int
 )
